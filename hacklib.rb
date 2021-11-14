@@ -1,28 +1,29 @@
-#-------------------------------------------------------------
-#
-#
-#                         HACKLIB
-#                        By TH3V0ID
-#
-#
-#-------------------------------------------------------------
-# Copyright (c) 2020 - 2022 Th3Void <https://github.com/th3void>
-#
-# This program is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public
-# License as published by the Free Software Foundation; either
-# version 3 of the License, or (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public
-# License along with this program; if not, write to the
-# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-# Boston, MA 02110-1301 USA
-#
+#-----------------------------------------------------------------------#
+#                                                                       #
+#                                                                       #
+#                         HACKLIB                                       #
+#                        By TH3V0ID                                     #
+#                                                                       #
+#                                                                       #
+#-----------------------------------------------------------------------#
+# Copyright (c) 2020 - 2022 Th3Void <https://github.com/th3void>        #
+#                                                                       #
+# This program is free software; you can redistribute it and/or         #
+# modify it under the terms of the GNU General Public                   #
+# License as published by the Free Software Foundation; either          #
+# version 3 of the License, or (at your option) any later version.      #  
+#                                                                       #
+# This program is distributed in the hope that it will be useful,       # 
+# but WITHOUT ANY WARRANTY; without even the implied warranty of        #
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU     #   
+# General Public License for more details.                              #
+#                                                                       #
+# You should have received a copy of the GNU General Public             #
+# License along with this program; if not, write to the                 #
+# Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,      #  
+# Boston, MA 02110-1301 USA                                             #
+#                                                                       #
+#-----------------------------------------------------------------------#        
 
 require_relative "./names.rb"
 
@@ -107,6 +108,40 @@ module hacklib
             puts "[ERROR]: Your system is not compatible with this feature at @hacklib_package_installer hacklib"
         end
     end # @hacklib_package_installer
+   
+    # Drop by zynix_fussion module web vul scanner
+    def hacklib_simple_domain_osint
+        hacklib_color_compose('yellow', "[+] :: Get robots.txt"
+            sys("wget https://www.#{$target}/robots.txt")
+        hacklib_color_compose('yellow', "[+] :: WHOIS"
+            sys("whois -a #{$target}")
+        hacklib_color_compose('yellow', "[+] :: Email Enumeration"
+            sys("theharvester -d #{$target} -l 500 -b all")
+        hacklib_color_compose('yellow', "[+] :: HTTP Banner grep at ~/outputs"
+            sys("ncat -v #{$ip} 80 >> ~/banner_port_80_#{$ip}_.html")
+        hacklib_color_compose('yellow', "[+] :: HTTPS Banner grep"
+            sys("openssl s_client -quiet -connect #{$target}:443 >> ~/banner_port_443_#{$ip}_.html")
+        hacklib_color_compose('yellow', "[+] :: Nikto scanner"
+            sys("nikto -h #{$ip}:443 -ssl")
+    end # @hacklib_simple_domain_osint
+
+    # Drop by zynix_fussion module maclookup
+    def hacklib_maclookup(vendor, path_db)
+        table = CSV.parse(File.read(db), headers: true)
+        i = 0
+        for x in table 
+            if table[i][0] = vendor
+                return table[i]
+            else
+                i = i+1 #yep
+            end
+        end
+    end # @hacklib_maclookup
+
+    # Drop by zynix_fussion module bluetooth
+    def hacklib_bluetooth_attacker(mac, times)
+        sys("bt-device -c #{target}")
+    end # @hacklib_bluetooth_attacker
 
     # Drop by zynix_fussion module rg_generator
     def hacklib_fake_rg_generator
@@ -204,15 +239,7 @@ module hacklib
         end
     end # @hacklib_fake_database_dump
 
+    def hacklib_file_manager
+    end
 
-
-        
-
-            
-
-
-end # module
-    
-    
-
-        
+end # module hacklib
