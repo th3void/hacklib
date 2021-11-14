@@ -36,7 +36,7 @@ module Hacklib
 
 	# Alias for system
 	def sys(command, log = false)   
-        if log == true ? shell_code = "echo '#{get_time()} :: #{command}' >> ./command_log.log" : nil
+        log == true ? shell_code = "echo '#{get_time()} :: #{command}' >> ./command_log.log" : nil
 		system(command)
 	end # @sys
 
@@ -89,8 +89,8 @@ module Hacklib
         pkg_list = ''
         string0 = "apt update && apt install #{pkg_list} -y"
         string1 = "sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-        https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y \
-        && dnf mackcache && dnf install #{pkg_list}"
+                    https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y \
+                    && dnf mackcache && dnf install #{pkg_list}"
         string2 = "pacman -Syu #{pkg_list}"
         pkg_manager = hacklib_system_detector()
         case pkg_manager
@@ -108,6 +108,33 @@ module Hacklib
             puts "[ERROR]: Your system is not compatible with this feature at @hacklib_package_installer hacklib"
         end
     end # @hacklib_package_installer
+
+    # Compress and decompress files
+    def hacklib_file_manager(file, operation, export = nil)
+
+        msg0 = "[ERROR]: File extension fail at @hacklib_file_manager"
+        msg1 = "[ERROR]: wrong input parameters at @hacklib_file_manager"
+        case operation
+        when 'extract tar'
+            File.extname(file) == ".tar" ? sys("tar xf #{file}.tar") : hacklib_color_compose('cyan', msg0)
+        when 'extract gz'
+            File.extname(file) == ".gz" ? sys("tar xzf #{file}.tar.gz") : hacklib_color_compose('cyan', msg0)
+        when 'extract bz2'
+            File.extname(file) == ".bz2" ? sys("tar xjf #{file}.tar.bz2") : hacklib_color_compose('cyan', msg0)
+        when 'extract zip'
+            File.extname(file) == ".zip" ? sys("unzip #{file}") : hacklib_color_compose('cyan', msg0)
+        when 'compress tar'
+            sys("tar cf #{export}.tar #{file}") == true ? hacklib_color_compose('green', '[+] Done') : hacklib_color_compose('cyan', msg1)
+        when 'compress gz'
+            sys("tar czf #{export}.tar.gz #{file}") == true ? hacklib_color_compose('green', '[+] Done') : hacklib_color_compose('cyan', msg1)
+        when 'compress bz2'
+            sys("tar cjf #{export}.tar.bz2 #{file}") == true ? hacklib_color_compose('green', '[+] Done') : hacklib_color_compose('cyan', msg1)
+        when 'compress zip'
+            sys("gzip #{file}") == true ? hacklib_color_compose('green', '[+] Done') : hacklib_color_compose('cyan', msg1)
+        else
+            hacklib_color_compose('red', '[ERROR]: File format not supported at @hacklib_file_manager')
+        end
+    end # @hacklib_file_manager
 
     # Drop by zynix_fussion module dir scanner
     def hacklib_dir_scanner(custom = false, silent = '', output = '', extension = '', delay = '', target_dns)
@@ -214,17 +241,12 @@ module Hacklib
 
     # Drop by zynix_fussion module name_generator
     def hacklib_fake_name_generator(sex)
-        # Select first name
         sex == 'm' ? first_name = $men[rand(0..$men.length)] : first_name = $wom[rand(0..$wom.length)]
-        # Select middle name
         middle_name = $middle[rand(0..$middle.length)]
-        # Select second middle name
         random_number = rand(0..10)
         random_number < 6 ? second_middle_name = $middle[rand(0..$middle.length)] : second_middle_name = nil
-        # Select fine name
         final_name = rand(0..10)
         final_name < 9 ? final_name = $final[rand(0..$final.length)] : final_name = nil
-        # Return the name
         return "#{first_name} #{middle_name} #{second_middle_name} #{final_name}"
     end # @hacklib_fake_name_generator
 
