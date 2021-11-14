@@ -37,7 +37,6 @@ module Hacklib
 	# Alias for system
 	def sys(command, log = false)   
         if log == true ? shell_code = "echo '#{get_time()} :: #{command}' >> ./command_log.log" : nil
-        end
 		system(command)
 	end # @sys
 
@@ -109,21 +108,43 @@ module Hacklib
             puts "[ERROR]: Your system is not compatible with this feature at @hacklib_package_installer hacklib"
         end
     end # @hacklib_package_installer
+
+    # Drop by zynix_fussion module dir scanner
+    def hacklib_dir_scanner(custom = false, silent = '', output = '', extension = '', delay = '', target_dns)
+        if custom == true
+            flags = "-i -w #{silent} #{output} #{extension} -z #{delay}"
+            sys("dirb #{target_dns} ./wordlist/directory_list.txt #{flags}")
+        else  
+            sys("dirb -i -w -S #{target_dns} ./wordlist/directory_list.txt")
+        end 
+    end # @hacklib_dir_scanner
+
+    # Drop by zynix_fussion module dns_scanner
+    def hacklib_dns_enumerator(target_dns)
+        sys("dnsenum --enum #{target} ./wordlist/dns.txt") 
+        reg_dns = ['A', 'AAAA', 'CNAME', 'MX', 'NS', 'PTR', 'SOA']
+        for reg in reg_dns
+            puts "[+] :: Search for #{reg} in #{target_dns}:"
+            sys("host -t #{reg} #{target_dns}")
+        end
+    end # @hacklib_dns_enumerator
    
     # Drop by zynix_fussion module web vul scanner
-    def hacklib_simple_domain_osint
+    def hacklib_simple_domain_osint(target_dns, target_ip)
         hacklib_color_compose('yellow', "[+] :: Get robots.txt")
-            sys("wget https://www.#{$target}/robots.txt")
+            sys("wget https://www.#{target_dns}/robots.txt")
+        hacklib_color_compose('yellow', "[+] :: Get robots.txt")
+            sys("wget https://www.#{target_dns}/sitemap.xml")
         hacklib_color_compose('yellow', "[+] :: WHOIS")
-            sys("whois -a #{$target}")
+            sys("whois -a #{target_dns}")
         hacklib_color_compose('yellow', "[+] :: Email Enumeration")
-            sys("theharvester -d #{$target} -l 500 -b all")
+            sys("theharvester -d #{target_dns} -l 500 -b all")
         hacklib_color_compose('yellow', "[+] :: HTTP Banner grep at ~/outputs")
-            sys("ncat -v #{$ip} 80 >> ~/banner_port_80_#{$ip}_.html")
+            sys("ncat -v #{target_ip} 80 >> ~/banner_port_80_#{target_ip}_.html")
         hacklib_color_compose('yellow', "[+] :: HTTPS Banner grep")
-            sys("openssl s_client -quiet -connect #{$target}:443 >> ~/banner_port_443_#{$ip}_.html")
+            sys("openssl s_client -quiet -connect #{target_dns}:443 >> ~/banner_port_443_#{target_ip}_.html")
         hacklib_color_compose('yellow', "[+] :: Nikto scanner")
-            sys("nikto -h #{$ip}:443 -ssl")
+            sys("nikto -h #{target_ip}:443 -ssl")
     end # @hacklib_simple_domain_osint
 
     # Drop by zynix_fussion module maclookup
