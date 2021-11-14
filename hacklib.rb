@@ -27,7 +27,7 @@
 
 require_relative "./names.rb"
 
-module hacklib
+module Hacklib
 
     # Get time
     def hacklib_get_time 
@@ -43,6 +43,7 @@ module hacklib
 
     # Generate strings with colors
     def hacklib_color_compose(color, string)
+        case color
         when 'red'
             print "\033[91m #{string}\033[00m" #Red
         when 'green'
@@ -86,12 +87,12 @@ module hacklib
 
     # Install additional packages
     def hacklib_package_installer
-        PKG_LIST = ''
-        string0 = "apt update && apt install #{PKG_LIST} -y"
+        pkg_list = ''
+        string0 = "apt update && apt install #{pkg_list} -y"
         string1 = "sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
         https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y \
-        && dnf mackcache && dnf install #{PKG_LIST}"
-        string2 = "pacman -Syu #{PKG_LIST}"
+        && dnf mackcache && dnf install #{pkg_list}"
+        string2 = "pacman -Syu #{pkg_list}"
         pkg_manager = hacklib_system_detector()
         case pkg_manager
         when 'APT'
@@ -111,17 +112,17 @@ module hacklib
    
     # Drop by zynix_fussion module web vul scanner
     def hacklib_simple_domain_osint
-        hacklib_color_compose('yellow', "[+] :: Get robots.txt"
+        hacklib_color_compose('yellow', "[+] :: Get robots.txt")
             sys("wget https://www.#{$target}/robots.txt")
-        hacklib_color_compose('yellow', "[+] :: WHOIS"
+        hacklib_color_compose('yellow', "[+] :: WHOIS")
             sys("whois -a #{$target}")
-        hacklib_color_compose('yellow', "[+] :: Email Enumeration"
+        hacklib_color_compose('yellow', "[+] :: Email Enumeration")
             sys("theharvester -d #{$target} -l 500 -b all")
-        hacklib_color_compose('yellow', "[+] :: HTTP Banner grep at ~/outputs"
+        hacklib_color_compose('yellow', "[+] :: HTTP Banner grep at ~/outputs")
             sys("ncat -v #{$ip} 80 >> ~/banner_port_80_#{$ip}_.html")
-        hacklib_color_compose('yellow', "[+] :: HTTPS Banner grep"
+        hacklib_color_compose('yellow', "[+] :: HTTPS Banner grep")
             sys("openssl s_client -quiet -connect #{$target}:443 >> ~/banner_port_443_#{$ip}_.html")
-        hacklib_color_compose('yellow', "[+] :: Nikto scanner"
+        hacklib_color_compose('yellow', "[+] :: Nikto scanner")
             sys("nikto -h #{$ip}:443 -ssl")
     end # @hacklib_simple_domain_osint
 
